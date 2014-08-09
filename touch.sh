@@ -14,7 +14,7 @@ sudo pacman -S --needed linux-headers
 
 # Grab kernel source
 echo "Fetching kernel sources..."
-git clone https://github.com/masmullin2000/kernel_tp_ts_bkl.git linux-${kernver}
+#git clone https://github.com/masmullin2000/kernel_tp_ts_bkl.git linux-${kernver}
 cd linux-${kernver}
 
 # Need this
@@ -31,7 +31,7 @@ echo "Building relevant modules..."
 make SUBDIRS=drivers/platform/chrome modules
 make SUBDIRS=drivers/i2c/busses modules
 make SUBDIRS=drivers/input/touchscreen modules
-make SUBDIRS=drivers/gpu/drm/i915 modules
+#make SUBDIRS=drivers/gpu/drm/i915 modules
 
 echo "Installing relevant modules..."
 # switch to using our new chromeos_laptop.ko module
@@ -55,8 +55,8 @@ sudo cp drivers/i2c/busses/i2c-designware-pci.ko /lib/modules/$archkernver/kerne
 sudo mv /lib/modules/$archkernver/kernel/drivers/input/touchscreen/atmel_mxt_ts.ko /lib/modules/$archkernver/kernel/drivers/input/touchscreen/atmel_mxt_ts.ko.orig
 sudo cp drivers/input/touchscreen/atmel_mxt_ts.ko /lib/modules/$archkernver/kernel/drivers/input/touchscreen/
 
-sudo mv /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko.orig
-sudo cp drivers/gpu/drm/i915/i915.ko /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko
+#sudo mv /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko.orig
+#sudo cp drivers/gpu/drm/i915/i915.ko /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko
 #sudo gzip /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko
 
 sudo depmod -a $archkernver
