@@ -15,7 +15,7 @@ sudo pacman -S --needed linux-headers
 
 # Grab kernel source
 echo "Fetching kernel sources..."
-#git clone https://github.com/masmullin2000/kernel_tp_ts_bkl.git linux-${kernver}
+git clone https://github.com/masmullin2000/kernel_tp_ts_bkl.git linux-${kernver}
 cd linux-${kernver}
 
 # Need this
