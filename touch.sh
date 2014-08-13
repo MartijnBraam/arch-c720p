@@ -7,6 +7,7 @@ set -e
 # Determine kernel version
 archkernver=$(uname -r)
 kernver=$(uname -r | cut -d'-' -f 1)
+kex=y
 
 # Install necessary deps to build a kernel
 echo "Installing linux-headers..."
@@ -22,7 +23,7 @@ cp /usr/lib/modules/${archkernver}/build/Module.symvers .
 
 # Prep tree
 zcat /proc/config.gz > ./.config
-make oldconfig
+make olddefconfig
 make prepare
 make modules_prepare
 
@@ -43,8 +44,11 @@ sudo mv  $chros_lap ${chros_lap}.orig
 fi
 sudo cp drivers/platform/chrome/chromeos_laptop.ko /lib/modules/$archkernver/kernel/drivers/platform/chrome/
 
+if [ $kex != 'y' ];
+then
 # switch to using our new designware i2c modules
 # preserve old as .orig
+echo Non gzip kernel modules
 sudo mv /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-core.ko /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-core.ko.orig
 sudo mv /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-pci.ko /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-pci.ko.orig
 sudo cp drivers/i2c/busses/i2c-designware-core.ko /lib/modules/$archkernver/kernel/drivers/i2c/busses/
@@ -58,7 +62,21 @@ sudo cp drivers/input/touchscreen/atmel_mxt_ts.ko /lib/modules/$archkernver/kern
 #sudo mv /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko.orig
 #sudo cp drivers/gpu/drm/i915/i915.ko /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko
 #sudo gzip /lib/modules/$archkernver/kernel/drivers/gpu/drm/i915/i915.ko
-
+else
+echo GZIPed kernel modules
+sudo gzip /lib/modules/$archkernver/kernel/drivers/platform/chrome/chromeos_laptop.ko
+# switch to using our new designware i2c modules
+# preserve old as .orig
+sudo mv /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-core.ko.gz /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-core.ko.gz.orig
+sudo mv /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-pci.ko.gz /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-pci.ko.gz.orig
+sudo cp drivers/i2c/busses/i2c-designware-*.ko /lib/modules/$archkernver/kernel/drivers/i2c/busses/
+sudo gzip /lib/modules/$archkernver/kernel/drivers/i2c/busses/i2c-designware-*.ko
+# switch to using our new atmel_mxt_ts.ko module
+# preserve old as .orig
+sudo mv /lib/modules/$archkernver/kernel/drivers/input/touchscreen/atmel_mxt_ts.ko.gz /lib/modules/$archkernver/kernel/drivers/input/touchscreen/atmel_mxt_ts.ko.gz.orig
+sudo cp drivers/input/touchscreen/atmel_mxt_ts.ko /lib/modules/$archkernver/kernel/drivers/input/touchscreen/
+sudo gzip /lib/modules/$archkernver/kernel/drivers/input/touchscreen/atmel_mxt_ts.ko
+fi
 sudo depmod -a $archkernver
 
 echo "Installing xf86-input-synaptics..."
